@@ -1,4 +1,6 @@
 
+{-# LANGUAGE CPP #-}
+
 -- | This module defines a type for sorted lists, together
 --   with several functions to create and use values of that
 --   type. Many operations are optimized to take advantage
@@ -24,6 +26,7 @@ module Data.SortedList (
   , splitAt
   , filter
     -- * Queries
+  , null
   , elemOrd
     -- * Others
   , nub
@@ -32,10 +35,20 @@ module Data.SortedList (
 import Prelude hiding
   ( take, drop, splitAt, filter
   , repeat, replicate, iterate
+  , null
+#if !MIN_VERSION_base(4,8,0)
+  , foldr
+#endif
     )
 import qualified Data.List as List
 import Data.Monoid ((<>))
 import Data.Foldable (toList)
+-- GHC 7.8.3 compatibility
+#if !MIN_VERSION_base(4,8,0)
+import Data.Monoid (Monoid (..))
+import Data.Foldable (Foldable, foldr)
+#endif
+--
 
 -- | Type of sorted lists. Any (non-bottom) value of this type
 --   is a sorted list.
@@ -43,6 +56,10 @@ newtype SortedList a = SortedList [a]
 
 instance Show a => Show (SortedList a) where
   show = show . fromSortedList
+
+-- | Check if a sorted list is empty.
+null :: SortedList a -> Bool
+null = List.null . fromSortedList
 
 -- | Decompose a sorted list into its minimal element and the rest.
 --   If the list is empty, it returns 'Nothing'.
@@ -150,6 +167,7 @@ nub (SortedList l) = SortedList $ go l
 instance Foldable SortedList where
   {-# INLINE foldr #-}
   foldr f e (SortedList xs) = foldr f e xs
+#if MIN_VERSION_base(4,8,0)
   {-# INLINE toList #-}
   toList = fromSortedList
   minimum (SortedList xs) =
@@ -160,3 +178,4 @@ instance Foldable SortedList where
     case xs of
       [] -> error "SortedList.maximum: empty list"
       _ -> last xs
+#endif

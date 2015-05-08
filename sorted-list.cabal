@@ -1,5 +1,5 @@
 name:                sorted-list
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:            Type-enforced sorted lists and related functions.
 description:         Type-enforced sorted lists and related functions.
                      .
