@@ -7,11 +7,12 @@ description:         Type-enforced sorted lists and related functions.
                      that it's still in development, so it might lack
                      some features. If you need them, do not hesitate
                      to ask by opening an issue at the bug-tracker.
-homepage:            none
+homepage:            https://github.com/Daniel-Diaz/sorted-list/blob/master/README.md
 license:             BSD3
 license-file:        LICENSE
 author:              Daniel Díaz
 maintainer:          dhelta.diaz@gmail.com
+bug-reports:         https://github.com/Daniel-Diaz/sorted-list/issues
 category:            Data
 build-type:          Simple
 cabal-version:       >=1.10
