@@ -44,9 +44,10 @@ import Prelude hiding
 #endif
     )
 import qualified Data.List as List
+#if MIN_VERSION_base(4,5,0)
 import Data.Monoid ((<>))
+#endif
 import Data.Foldable (Foldable (..))
--- GHC 7.8.3 compatibility
 #if !MIN_VERSION_base(4,8,0)
 import Data.Monoid (Monoid (..))
 #endif
@@ -124,7 +125,11 @@ iterate f x = SortedList $ x : go x (f x)
 
 -- | /O(n)/. Insert a new element in a sorted list.
 insert :: Ord a => a -> SortedList a -> SortedList a
+#if MIN_VERSION_base(4,5,0)
 insert x xs = singleton x <> xs
+#else
+insert x xs = mappend (singleton x) xs
+#endif
 
 -- | Extract the prefix with the given length from a sorted list.
 take :: Int -> SortedList a -> SortedList a
