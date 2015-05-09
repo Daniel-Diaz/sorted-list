@@ -26,6 +26,9 @@ module Data.SortedList (
   , splitAt
   , filter
     -- * Queries
+#if !MIN_VERSION_base(4,8,0)
+  , null
+#endif
   , elemOrd
     -- * Others
   , map
@@ -46,7 +49,6 @@ import Data.Foldable (Foldable (..))
 -- GHC 7.8.3 compatibility
 #if !MIN_VERSION_base(4,8,0)
 import Data.Monoid (Monoid (..))
-import Data.Foldable (Foldable, foldr)
 #endif
 --
 
