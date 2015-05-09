@@ -52,7 +52,7 @@ import Data.Foldable (Foldable, foldr)
 
 -- | Type of sorted lists. Any (non-bottom) value of this type
 --   is a sorted list.
-newtype SortedList a = SortedList [a]
+newtype SortedList a = SortedList [a] deriving (Eq, Ord)
 
 instance Show a => Show (SortedList a) where
   show = show . fromSortedList
