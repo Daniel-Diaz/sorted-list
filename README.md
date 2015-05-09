@@ -16,3 +16,12 @@ will probably be enough to get me working on it.
 # Travis build badge
 
 [![Build Status](https://travis-ci.org/Daniel-Diaz/sorted-list.svg?branch=master)](https://travis-ci.org/Daniel-Diaz/sorted-list)
+
+GHC versions used by the travis build:
+
+* 7.0
+* 7.4
+* 7.6
+* 7.8
+
+This means `sorted-list` should compile easily against these versions of GHC.
