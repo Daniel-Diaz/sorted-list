@@ -26,23 +26,23 @@ module Data.SortedList (
   , splitAt
   , filter
     -- * Queries
-  , null
   , elemOrd
     -- * Others
+  , map
   , nub
   ) where
 
 import Prelude hiding
   ( take, drop, splitAt, filter
   , repeat, replicate, iterate
-  , null
+  , null, map
 #if !MIN_VERSION_base(4,8,0)
   , foldr
 #endif
     )
 import qualified Data.List as List
 import Data.Monoid ((<>))
-import Data.Foldable (toList)
+import Data.Foldable (Foldable (..))
 -- GHC 7.8.3 compatibility
 #if !MIN_VERSION_base(4,8,0)
 import Data.Monoid (Monoid (..))
@@ -57,9 +57,11 @@ newtype SortedList a = SortedList [a]
 instance Show a => Show (SortedList a) where
   show = show . fromSortedList
 
+#if !MIN_VERSION_base(4,8,0)
 -- | Check if a sorted list is empty.
 null :: SortedList a -> Bool
 null = List.null . fromSortedList
+#endif
 
 -- | Decompose a sorted list into its minimal element and the rest.
 --   If the list is empty, it returns 'Nothing'.
@@ -179,3 +181,21 @@ instance Foldable SortedList where
       [] -> error "SortedList.maximum: empty list"
       _ -> last xs
 #endif
+
+-- | Map a function over all the elements of a sorted list.
+--   Note that 'map' will hang if the argument is an infinite list.
+--
+--   Even though 'SortedList' can't be made an instance of 'Functor',
+--   'map' /does/ hold the 'Functor' laws. The problem to write the
+--   the instance is the 'Ord' instance requirement on the type of
+--   the elements of the result list. Therefore, while 'SortedList'
+--   is not a functor type in general, it is when restricted to elements of
+--   orderable types.
+map :: Ord b => (a -> b) -> SortedList a -> SortedList b
+{-# INLINE[1] map #-}
+map f = foldr (insert . f) mempty
+
+{-# RULES
+"SortedList:map/map" forall f g xs. map f (map g xs) = map (f . g) xs
+"SortedList:map/id"  forall xs.     map id xs = xs
+  #-}
