@@ -12,3 +12,7 @@ This library has been entirely developed in GHC-7.10. Although efforts
 are spent making it buildable with previous versions, some features may
 be missing. If you need any of these missing features, opening an issue
 will probably be enough to get me working on it.
+
+# Travis build badge
+
+[![Build Status](https://travis-ci.org/Daniel-Diaz/sorted-list.svg?branch=master)](https://travis-ci.org/Daniel-Diaz/sorted-list)
