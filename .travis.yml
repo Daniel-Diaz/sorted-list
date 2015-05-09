@@ -13,6 +13,7 @@ os:
 before_script:
   - cabal sandbox init
   - cabal install --only-dependencies
+  - ghc-pkg list
 
 script:
   - cabal configure --ghc-option=-Werror
