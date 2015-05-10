@@ -30,20 +30,23 @@ module Data.SortedList (
   , null
 #endif
   , elemOrd
-    -- * Others
+    -- * @map@ function
   , map
+    -- * Others
   , nub
+  , reverse, reverseDown
   ) where
 
 import Prelude hiding
   ( take, drop, splitAt, filter
   , repeat, replicate, iterate
-  , null, map
+  , null, map, reverse
 #if !MIN_VERSION_base(4,8,0)
   , foldr
 #endif
     )
 import qualified Data.List as List
+import Data.Ord (Down (..))
 #if MIN_VERSION_base(4,5,0)
 import Data.Monoid ((<>))
 #endif
@@ -206,3 +209,16 @@ map f = foldr (insert . f) mempty
 "SortedList:map/map" forall f g xs. map f (map g xs) = map (f . g) xs
 "SortedList:map/id"  forall xs.     map id xs = xs
   #-}
+
+-- | /O(n)/. Reverse a sorted list. The result uses 'Down', thus it is a sorted
+--   list as well.
+reverse :: SortedList a -> SortedList (Down a)
+{-# INLINE[2] reverse #-}
+reverse = SortedList . List.reverse . fmap Down . fromSortedList
+
+-- | /O(n)/. Reverse a sorted list with elements embedded in the 'Down' type.
+reverseDown :: SortedList (Down a) -> SortedList a
+{-# INLINE[2] reverseDown #-}
+reverseDown = SortedList . List.reverse . fmap unDown . fromSortedList
+  where
+    unDown (Down a) = a
