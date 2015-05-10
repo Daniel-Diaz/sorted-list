@@ -48,11 +48,13 @@ import Prelude hiding
 #endif
     )
 import qualified Data.List as List
-import Data.Ord (Down (..))
+import Data.Foldable (Foldable (..))
 #if MIN_VERSION_base(4,5,0)
 import Data.Monoid ((<>))
 #endif
-import Data.Foldable (Foldable (..))
+#if MIN_VERSION_base(4,6,0)
+import Data.Ord (Down (..))
+#endif
 #if !MIN_VERSION_base(4,8,0)
 import Data.Monoid (Monoid (..))
 #endif
