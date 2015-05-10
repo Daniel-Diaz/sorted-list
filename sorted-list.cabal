@@ -25,6 +25,7 @@ library
   ghc-options:         -Wall
 
 benchmark sorted-list-map-bench
+  default-language: Haskell2010
   type: exitcode-stdio-1.0
   hs-source-dirs: bench
   main-is: map.hs
