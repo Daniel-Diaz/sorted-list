@@ -58,6 +58,8 @@ import Prelude hiding
     )
 import qualified Data.List as List
 import Data.Foldable (Foldable (..))
+import Control.DeepSeq (NFData (..))
+--
 #if MIN_VERSION_base(4,5,0)
 import Data.Monoid ((<>))
 #endif
@@ -75,6 +77,10 @@ newtype SortedList a = SortedList [a] deriving (Eq, Ord)
 
 instance Show a => Show (SortedList a) where
   show = show . fromSortedList
+
+instance NFData a => NFData (SortedList a) where
+  {-# INLINE rnf #-}
+  rnf (SortedList xs) = rnf xs
 
 #if !MIN_VERSION_base(4,8,0)
 -- | Check if a sorted list is empty.
