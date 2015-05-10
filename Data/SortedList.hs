@@ -34,7 +34,7 @@ module Data.SortedList (
   , map
     -- * Others
   , nub
-#if MIN_VERSION_BASE(4,6,0)
+#if MIN_VERSION_base(4,6,0)
   , reverse, reverseDown
 #endif
   ) where
