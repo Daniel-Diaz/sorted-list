@@ -32,6 +32,8 @@ module Data.SortedList (
   , elemOrd
     -- * @map@ function
   , map
+    -- Unfolding
+  , unfoldr
     -- * Others
   , nub
 #if MIN_VERSION_base(4,6,0)
@@ -113,6 +115,25 @@ repeat = SortedList . List.repeat
 replicate :: Int -> a -> SortedList a
 replicate n = SortedList . List.replicate n
 
+-- | Dual (sort of) to 'foldr' for sorted lists. It builds a sorted list from
+--   a generator function and an initial element. The generator function is
+--   applied to the initial element, and then it will produce either 'Nothing'
+--   - meaning that the list building must stop - or 'Just' applied to the
+--   value that is going to be added to the list, and a new accumulator to be fed
+--   to the generator function. The list building will stop prematurely if the
+--   generator function happens to create an element for the list that is strictly
+--   smaller than the previous value.
+unfoldr :: Ord a => (b -> Maybe (a,b)) -> b -> SortedList a
+unfoldr f e = SortedList $
+  let g (prev,acc) = do
+        (curr,acc') <- f acc
+        if prev <= curr
+           then Just (curr, (curr, acc'))
+           else Nothing
+  in  case f e of
+        Just (x0,e') -> x0 : List.unfoldr g (x0,e')
+        _ -> []
+
 -- | Create a sorted list by repeatedly applying the same
 --   function to an element, until the image by that function
 --   is stricly less than its argument. In other words:
@@ -122,13 +143,13 @@ replicate n = SortedList . List.replicate n
 --   With the list ending whenever
 --   @f (f (... (f (f x)) ...)) < f (... (f (f x)) ...)@.
 --   If this never happens, the list will be infinite.
+--
+--   The following holds:
+--
+-- > iterate f = unfoldr (\x -> Just (x, f x))
+--
 iterate :: Ord a => (a -> a) -> a -> SortedList a
-iterate f x = SortedList $ x : go x (f x)
-  where
-    go prev fprev =
-      if prev <= fprev
-         then fprev : go fprev (f fprev)
-         else []
+iterate f = unfoldr $ \x -> Just (x, f x)
 
 -- | /O(n)/. Insert a new element in a sorted list.
 insert :: Ord a => a -> SortedList a -> SortedList a
