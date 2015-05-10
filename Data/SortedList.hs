@@ -24,10 +24,11 @@ module Data.SortedList (
   , take
   , drop
   , splitAt
-  , filter
   , takeWhile
   , dropWhile
   , span
+  , filter
+  , partition
     -- * Queries
 #if !MIN_VERSION_base(4,8,0)
   , null
@@ -180,9 +181,17 @@ splitAt n (SortedList xs) =
   let (ys,zs) = List.splitAt n xs
   in  (SortedList ys, SortedList zs)
 
+-- | /O(n)/. Divide a sorted list into two lists, one with all the elements
+--   that satisfy the given predicate, and another list with the rest of
+--   elements.
+partition :: (a -> Bool) -> SortedList a -> (SortedList a, SortedList a)
+partition f (SortedList xs) =
+  let (ys,zs) = List.partition f xs
+  in  (SortedList ys, SortedList zs)
+
 -- | /O(n)/. Extract the elements of a list that satisfy the predicate.
 filter :: (a -> Bool) -> SortedList a -> SortedList a
-filter f (SortedList xs) = SortedList $ List.filter f xs
+filter f = fst . partition f
 
 -- | /O(n)/. An efficient implementation of 'elem', using the 'Ord'
 --   instance of the elements in a sorted list. It only traverses
