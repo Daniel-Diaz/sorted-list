@@ -76,6 +76,8 @@ instance Show a => Show (SortedList a) where
 
 #if !MIN_VERSION_base(4,8,0)
 -- | Check if a sorted list is empty.
+--   /This function dissappears in @base@ version 4.8.0.0 in favor of @null@/
+--   /from "Data.Traversable"./
 null :: SortedList a -> Bool
 null = List.null . fromSortedList
 #endif
