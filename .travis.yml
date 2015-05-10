@@ -11,6 +11,7 @@ os:
   - osx
 
 before_script:
+  - ghc-pkg list
   - cabal sandbox init
   - cabal install --only-dependencies
   - ghc-pkg list
