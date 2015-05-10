@@ -193,8 +193,8 @@ instance Foldable SortedList where
 --   Note that 'map' will hang if the argument is an infinite list.
 --
 --   Even though 'SortedList' can't be made an instance of 'Functor',
---   'map' /does/ hold the 'Functor' laws. The problem to write the
---   the instance is the 'Ord' instance requirement on the type of
+--   'map' /does/ hold the 'Functor' laws. The problem to write
+--   this instance is the 'Ord' instance requirement on the type of
 --   the elements of the result list. Therefore, while 'SortedList'
 --   is not a functor type in general, it is when restricted to elements of
 --   orderable types.
