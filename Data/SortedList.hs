@@ -25,6 +25,9 @@ module Data.SortedList (
   , drop
   , splitAt
   , filter
+  , takeWhile
+  , dropWhile
+  , span
     -- * Queries
 #if !MIN_VERSION_base(4,8,0)
   , null
@@ -45,6 +48,7 @@ import Prelude hiding
   ( take, drop, splitAt, filter
   , repeat, replicate, iterate
   , null, map, reverse
+  , span, takeWhile, dropWhile
 #if !MIN_VERSION_base(4,8,0)
   , foldr
 #endif
@@ -238,12 +242,13 @@ map f = foldr (insert . f) mempty
 #if MIN_VERSION_base(4,6,0)
 
 -- | /O(n)/. Reverse a sorted list. The result uses 'Down', thus it is a sorted
---   list as well.
+--   list as well. /Only available from @base@ version 4.6.0.0./
 reverse :: SortedList a -> SortedList (Down a)
 {-# INLINE[2] reverse #-}
 reverse = SortedList . List.reverse . fmap Down . fromSortedList
 
 -- | /O(n)/. Reverse a sorted list with elements embedded in the 'Down' type.
+--   /Only available from @base@ version 4.6.0.0./
 reverseDown :: SortedList (Down a) -> SortedList a
 {-# INLINE[2] reverseDown #-}
 reverseDown = SortedList . List.reverse . fmap unDown . fromSortedList
@@ -251,3 +256,19 @@ reverseDown = SortedList . List.reverse . fmap unDown . fromSortedList
     unDown (Down a) = a
 
 #endif
+
+-- | Return the longest prefix of a sorted list of elements that satisfy the given condition,
+--   and the rest of the list.
+span :: (a -> Bool) -> SortedList a -> (SortedList a, SortedList a)
+span f (SortedList xs) =
+  let (ys,zs) = List.span f xs
+  in  (SortedList ys, SortedList zs)
+
+-- | Return the longest prefix of a sorted list of elements that satisfy the given condition.
+takeWhile :: (a -> Bool) -> SortedList a -> SortedList a
+takeWhile f = fst . span f
+
+-- | Return the suffix remaining after dropping the longest prefix of elements that satisfy
+--   the given condition.
+dropWhile :: (a -> Bool) -> SortedList a -> SortedList a
+dropWhile f = snd . span f
