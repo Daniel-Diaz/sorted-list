@@ -85,7 +85,7 @@ uncons (SortedList (x:xs)) = Just (x, SortedList xs)
 toSortedList :: Ord a => [a] -> SortedList a
 toSortedList = SortedList . List.sort
 
--- | Create a list from a 'SortedList'. The returned list
+-- | /O(1)/. Create a list from a 'SortedList'. The returned list
 --   is guaranteed to be sorted.
 fromSortedList :: SortedList a -> [a]
 fromSortedList (SortedList xs) = xs
