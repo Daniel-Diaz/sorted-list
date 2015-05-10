@@ -75,7 +75,7 @@ null :: SortedList a -> Bool
 null = List.null . fromSortedList
 #endif
 
--- | Decompose a sorted list into its minimal element and the rest.
+-- | /O(1)/. Decompose a sorted list into its minimal element and the rest.
 --   If the list is empty, it returns 'Nothing'.
 uncons :: SortedList a -> Maybe (a, SortedList a)
 uncons (SortedList []) = Nothing
