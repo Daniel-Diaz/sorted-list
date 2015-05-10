@@ -34,7 +34,9 @@ module Data.SortedList (
   , map
     -- * Others
   , nub
+#if MIN_VERSION_BASE(4,6,0)
   , reverse, reverseDown
+#endif
   ) where
 
 import Prelude hiding
@@ -210,6 +212,8 @@ map f = foldr (insert . f) mempty
 "SortedList:map/id"  forall xs.     map id xs = xs
   #-}
 
+#if MIN_VERSION_base(4,6,0)
+
 -- | /O(n)/. Reverse a sorted list. The result uses 'Down', thus it is a sorted
 --   list as well.
 reverse :: SortedList a -> SortedList (Down a)
@@ -222,3 +226,5 @@ reverseDown :: SortedList (Down a) -> SortedList a
 reverseDown = SortedList . List.reverse . fmap unDown . fromSortedList
   where
     unDown (Down a) = a
+
+#endif
