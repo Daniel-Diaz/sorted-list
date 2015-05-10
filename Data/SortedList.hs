@@ -34,9 +34,11 @@ module Data.SortedList (
   , null
 #endif
   , elemOrd
+  , findIndices
     -- * @map@ function
   , map
-    -- Unfolding
+  , mapDec
+    -- * Unfolding
   , unfoldr
     -- * Others
   , nub
@@ -151,7 +153,7 @@ unfoldr f e = SortedList $
 --   @f (f (... (f (f x)) ...)) < f (... (f (f x)) ...)@.
 --   If this never happens, the list will be infinite.
 --
---   The following holds:
+--   By definition:
 --
 -- > iterate f = unfoldr (\x -> Just (x, f x))
 --
@@ -241,24 +243,49 @@ instance Foldable SortedList where
 --   the elements of the result list. Therefore, while 'SortedList'
 --   is not a functor type in general, it is when restricted to elements of
 --   orderable types.
+--
+--   The complexity range goes from /O(n)/ (if the function is monotonically increasing)
+--   to /O(n²)/ (if the function is monotonically decreasing). These are the best
+--   and worst case scenarios. We provide an alternative ('mapDec') where monotonically
+--   decreasing functions are the best case scenario.
 map :: Ord b => (a -> b) -> SortedList a -> SortedList b
 {-# INLINE[1] map #-}
 map f = foldr (insert . f) mempty
 
+-- | Just like 'map', but favoring functions that are monotonically decreasing instead
+--   of those that are monotonically increasing.
+mapDec :: Ord b => (a -> b) -> SortedList a -> SortedList b
+{-# INLINE[1] mapDec #-}
+mapDec f = foldl (\xs x -> insert (f x) xs) mempty
+
 {-# RULES
 "SortedList:map/map" forall f g xs. map f (map g xs) = map (f . g) xs
 "SortedList:map/id"  forall xs.     map id xs = xs
+
+"SortedList:mapDec/mapDec" forall f g xs. mapDec f (map g xs) = mapDec (f . g) xs
+"SortedList:mapDec/map" forall f g xs. mapDec f (map g xs) = map (f . g) xs
+"SortedList:map/mapDec" forall f g xs. map f (mapDec g xs) = map (f . g) xs
+"SortedList:mapDec/id"  forall xs.     mapDec id xs = xs
   #-}
 
 #if MIN_VERSION_base(4,6,0)
 
 -- | /O(n)/. Reverse a sorted list. The result uses 'Down', thus it is a sorted
---   list as well. /Only available from @base@ version 4.6.0.0./
+--   list as well. The following equality holds for any sorted list @xs@:
+--
+-- > map Down xs = reverse xs
+--
+--   /Only available from @base@ version 4.6.0.0./
 reverse :: SortedList a -> SortedList (Down a)
 {-# INLINE[2] reverse #-}
 reverse = SortedList . List.reverse . fmap Down . fromSortedList
 
+{-# RULES
+"SortedList:map/Down" forall xs. map Down xs = reverse xs
+  #-}
+
 -- | /O(n)/. Reverse a sorted list with elements embedded in the 'Down' type.
+--
 --   /Only available from @base@ version 4.6.0.0./
 reverseDown :: SortedList (Down a) -> SortedList a
 {-# INLINE[2] reverseDown #-}
@@ -283,3 +310,7 @@ takeWhile f = fst . span f
 --   the given condition.
 dropWhile :: (a -> Bool) -> SortedList a -> SortedList a
 dropWhile f = snd . span f
+
+-- | Return the indices of all elements in a sorted list that satisfy the given condition.
+findIndices :: (a -> Bool) -> SortedList a -> SortedList Int
+findIndices f (SortedList xs) = SortedList $ List.findIndices f xs
