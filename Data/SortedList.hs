@@ -53,7 +53,7 @@ import Prelude hiding
   , null, map, reverse
   , span, takeWhile, dropWhile
 #if !MIN_VERSION_base(4,8,0)
-  , foldr
+  , foldr, foldl
 #endif
     )
 import qualified Data.List as List
