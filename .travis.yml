@@ -1,14 +1,12 @@
 language: haskell
 
 ghc:
-  - 7.0
   - 7.4
   - 7.6
   - 7.8
 
 os:
   - linux
-  - osx
 
 before_script:
   - ghc-pkg list
