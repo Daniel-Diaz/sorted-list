@@ -20,6 +20,8 @@ module Data.SortedList (
   , uncons
     -- * Inserting
   , insert
+    -- * Deleting
+  , delete
     -- * Sublists
   , take
   , drop
@@ -174,6 +176,11 @@ insert x xs = singleton x <> xs
 #else
 insert x xs = mappend (singleton x) xs
 #endif
+
+-- | Delete the first occurrence of the given element.
+delete :: Eq a => a -> SortedList a -> SortedList a
+{-# INLINE delete #-}
+delete x (SortedList xs) = SortedList $ List.delete x xs
 
 -- | Extract the prefix with the given length from a sorted list.
 take :: Int -> SortedList a -> SortedList a
