@@ -19,7 +19,6 @@ will probably be enough to get me working on it.
 
 GHC versions used by the travis build:
 
-* 7.0
 * 7.4
 * 7.6
 * 7.8
