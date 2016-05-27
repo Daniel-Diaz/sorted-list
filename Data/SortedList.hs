@@ -1,5 +1,5 @@
 
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, TypeFamilies #-}
 
 -- | This module defines a type for sorted lists, together
 --   with several functions to create and use values of that
@@ -61,15 +61,21 @@ import Prelude hiding
 #endif
     )
 import qualified Data.List as List
-import Data.Foldable (Foldable (..))
 import Control.DeepSeq (NFData (..))
+import Data.Foldable (Foldable (..))
 --
 #if MIN_VERSION_base(4,5,0)
 import Data.Monoid ((<>))
 #endif
+--
 #if MIN_VERSION_base(4,6,0)
 import Data.Ord (Down (..))
 #endif
+--
+#if MIN_VERSION_base(4,7,0)
+import qualified GHC.Exts as Exts
+#endif
+--
 #if !MIN_VERSION_base(4,8,0)
 import Data.Monoid (Monoid (..))
 #endif
@@ -85,6 +91,13 @@ instance Show a => Show (SortedList a) where
 instance NFData a => NFData (SortedList a) where
   {-# INLINE rnf #-}
   rnf (SortedList xs) = rnf xs
+
+#if MIN_VERSION_base(4,7,0)
+instance Ord a => Exts.IsList (SortedList a) where
+  type (Item (SortedList a)) = a
+  fromList = toSortedList
+  toList = fromSortedList
+#endif
 
 #if !MIN_VERSION_base(4,8,0)
 -- | Check if a sorted list is empty.
