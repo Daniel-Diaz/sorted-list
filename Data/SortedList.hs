@@ -30,8 +30,8 @@ module Data.SortedList (
   , dropWhile
   , span
   , filter
-  , filterLT
-  , filterGT
+  , filterLE
+  , filterGE
   , partition
     -- * Queries
 #if !MIN_VERSION_base(4,8,0)
@@ -227,15 +227,15 @@ filter :: (a -> Bool) -> SortedList a -> SortedList a
 filter f = fst . partition f
 
 -- | /O(n)/. Select only elements less or equal to the argument.
-filterLT :: Ord a => a -> SortedList a -> SortedList a
-filterLT a (SortedList l) = SortedList $ go l
+filterLE :: Ord a => a -> SortedList a -> SortedList a
+filterLE a (SortedList l) = SortedList $ go l
   where
     go (x:xs) = if x <= a then x : go xs else []
     go [] = []
 
 -- | /O(n)/. Select only elements greater or equal to the argument.
-filterGT :: Ord a => a -> SortedList a -> SortedList a
-filterGT a (SortedList l) = SortedList $ go l
+filterGE :: Ord a => a -> SortedList a -> SortedList a
+filterGE a (SortedList l) = SortedList $ go l
   where
     go (x:xs) = if a <= x then x : xs else go xs
     go [] = []
