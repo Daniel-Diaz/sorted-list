@@ -371,6 +371,6 @@ takeWhile f = fst . span f
 dropWhile :: (a -> Bool) -> SortedList a -> SortedList a
 dropWhile f = snd . span f
 
--- | Return the indices of all elements in a sorted list that satisfy the given condition.
+-- | /O(n)/. Return the indices of all elements in a sorted list that satisfy the given condition.
 findIndices :: (a -> Bool) -> SortedList a -> SortedList Int
 findIndices f (SortedList xs) = SortedList $ List.findIndices f xs
