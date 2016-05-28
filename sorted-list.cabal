@@ -1,11 +1,28 @@
 name:                sorted-list
-version:             0.1.6.0
+version:             0.1.6.1
 synopsis:            Type-enforced sorted lists and related functions.
 description:         Type-enforced sorted lists and related functions.
                      .
-                     Feel free to try this library, but take in account
-                     that it's still in development, so it might lack
-                     some features. If you need them, do not hesitate
+                     These are useful for:
+                     .
+                     * Constraining the argument of a function to be a sorted list
+                       by stating in your type that the input list is a sorted list.
+                     .
+                     * Avoiding sorting a list twice.
+                     .
+                     * Creating a list that is sorted from the moment of its construction,
+                       so it doesn't have to be sorted later.
+                     .
+                     * Performing list operations keeping the input list sorted.
+                     .
+                     * Improving those list operations that can be
+                       benefited from the ordering of its elements.
+                     .
+                     * Creating infinite lists that are sorted!
+                     .
+                     * And more!
+                     .
+                     If you are missing a feature, do not hesitate
                      to ask by opening an issue at the bug-tracker.
 homepage:            https://github.com/Daniel-Diaz/sorted-list/blob/master/README.md
 license:             BSD3

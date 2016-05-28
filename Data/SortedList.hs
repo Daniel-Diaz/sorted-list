@@ -285,7 +285,7 @@ instance Foldable SortedList where
 --   We can't however write an instance because of the 'Ord' instance requirement on the type of
 --   the elements of the result list. Therefore, while 'SortedList'
 --   is not a functor type in general, it is when restricted to elements of
---   orderable types.
+--   orderable types (for finite lists).
 --
 --   The complexity range goes from /O(n)/ (if the function is monotonically increasing)
 --   to /O(n²)/ (if the function is monotonically decreasing). These are the best
