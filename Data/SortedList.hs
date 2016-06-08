@@ -67,7 +67,7 @@ import qualified Data.List as List
 import Control.DeepSeq (NFData (..))
 import Data.Foldable (Foldable (..))
 --
-#if MIN_VERSION_base(4,5,0)
+#if MIN_VERSION_base(4,5,0) && !MIN_VERSION_base(4,9,0)
 import Data.Monoid ((<>))
 #endif
 --
@@ -83,6 +83,9 @@ import qualified GHC.Exts as Exts
 import Data.Monoid (Monoid (..))
 #endif
 --
+#if MIN_VERSION_base(4,9,0)
+import Data.Semigroup (Semigroup (..))
+#endif
 
 -- | Type of sorted lists. Any (non-bottom) value of this type
 --   is a sorted list.
@@ -134,9 +137,17 @@ mergeSortedLists (x:xs) (y:ys) =
      then x : mergeSortedLists xs (y:ys)
      else y : mergeSortedLists (x:xs) ys
 
+#if MIN_VERSION_base(4,9,0)
+instance Ord a => Semigroup (SortedList a) where
+  SortedList xs <> SortedList ys = SortedList $ mergeSortedLists xs ys
+instance Ord a => Monoid (SortedList a) where
+  mempty = SortedList []
+  mappend = (<>)
+#else
 instance Ord a => Monoid (SortedList a) where
   mempty = SortedList []
   mappend (SortedList xs) (SortedList ys) = SortedList $ mergeSortedLists xs ys
+#endif
 
 -- | /O(1)/. Create a sorted list with only one element.
 singleton :: a -> SortedList a
