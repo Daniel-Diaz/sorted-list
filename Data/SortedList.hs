@@ -88,7 +88,8 @@ import Data.Semigroup (Semigroup (..))
 #endif
 
 -- | Type of sorted lists. Any (non-bottom) value of this type
---   is a sorted list.
+--   is a sorted list. Use the 'Monoid' instance to append sorted
+--   lists.
 newtype SortedList a = SortedList [a] deriving (Eq, Ord)
 
 instance Show a => Show (SortedList a) where
