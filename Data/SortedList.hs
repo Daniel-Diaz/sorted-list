@@ -130,6 +130,8 @@ toSortedList = SortedList . List.sort
 fromSortedList :: SortedList a -> [a]
 fromSortedList (SortedList xs) = xs
 
+-- | Merge two sorted lists. This assumes that both input lists
+--   are sorted.
 mergeSortedLists :: Ord a => [a] -> [a] -> [a]
 mergeSortedLists xs [] = xs
 mergeSortedLists [] ys = ys
