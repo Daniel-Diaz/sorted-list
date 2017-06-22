@@ -48,10 +48,13 @@ module Data.SortedList (
     -- * Unfolding
   , unfoldr
     -- * Others
-  , nub
 #if MIN_VERSION_base(4,6,0)
   , reverse, reverseDown
 #endif
+    -- * Set operations
+  , nub
+  , intersect
+  , union
   ) where
 
 import Prelude hiding
@@ -388,3 +391,13 @@ dropWhile f = snd . span f
 -- | /O(n)/. Return the indices of all elements in a sorted list that satisfy the given condition.
 findIndices :: (a -> Bool) -> SortedList a -> SortedList Int
 findIndices f (SortedList xs) = SortedList $ List.findIndices f xs
+
+-- | Intersection of sorted lists. If the first list contains duplicates, so will the result.
+intersect :: Eq a => SortedList a -> SortedList a -> SortedList a
+intersect (SortedList xs) (SortedList ys) = SortedList (List.intersect xs ys)
+
+-- | Union of sorted lists.
+--   Duplicates, and elements of the first list, are removed from the the second list,
+--   but if the first list contains duplicates, so will the result.
+union :: Ord a => SortedList a -> SortedList a -> SortedList a
+union xs ys = xs `mappend` foldl (flip delete) (nub ys) xs
