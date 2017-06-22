@@ -54,6 +54,7 @@ module Data.SortedList (
     -- * Set operations
   , nub
   , intersect
+  , intersect2
   , union
   ) where
 
@@ -392,9 +393,19 @@ dropWhile f = snd . span f
 findIndices :: (a -> Bool) -> SortedList a -> SortedList Int
 findIndices f (SortedList xs) = SortedList $ List.findIndices f xs
 
--- | Intersection of sorted lists. If the first list contains duplicates, so will the result.
-intersect :: Eq a => SortedList a -> SortedList a -> SortedList a
-intersect (SortedList xs) (SortedList ys) = SortedList (List.intersect xs ys)
+-- | /O(n+m)/. Intersection of sorted lists. If the first list contains duplicates, so will the result.
+intersect :: Ord a => SortedList a -> SortedList a -> SortedList a
+intersect xs ys =
+  let SortedList xs' = xs
+      SortedList ys' = nub ys
+      go [] _ = []
+      go _  [] = []
+      go pp@(p:ps) qq@(q:qs) =
+        case p `compare` q of
+          LT ->     go ps qq
+          EQ -> p : go ps qq
+          GT ->     go pp qs
+  in  SortedList $ go xs' ys'
 
 -- | Union of sorted lists.
 --   Duplicates, and elements of the first list, are removed from the the second list,
