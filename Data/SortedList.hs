@@ -54,7 +54,6 @@ module Data.SortedList (
     -- * Set operations
   , nub
   , intersect
-  , intersect2
   , union
   ) where
 
