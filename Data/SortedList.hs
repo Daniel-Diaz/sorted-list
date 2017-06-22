@@ -397,7 +397,7 @@ intersect :: Ord a => SortedList a -> SortedList a -> SortedList a
 intersect xs ys =
   let SortedList xs' = xs
       SortedList ys' = nub ys
-      go [] _ = []
+      go [] _  = []
       go _  [] = []
       go pp@(p:ps) qq@(q:qs) =
         case p `compare` q of
