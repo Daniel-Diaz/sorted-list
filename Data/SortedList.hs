@@ -1,5 +1,5 @@
 
-{-# LANGUAGE CPP, TypeFamilies #-}
+{-# LANGUAGE CPP, Safe, TypeFamilies #-}
 
 -- | This module defines a type for sorted lists, together
 --   with several functions to create and use values of that
