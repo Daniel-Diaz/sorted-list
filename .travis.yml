@@ -25,7 +25,7 @@ before_install:
 install:
 # Build dependencies
 - git clone https://github.com/Daniel-Diaz/stackage-multibuild.git
-- cd stackage-multibuild && stack install
+- cd stackage-multibuild && stack install && cd ..
 
 script:
 # Build the package, its tests, and its docs and run the tests
