@@ -1,5 +1,5 @@
 
-{-# LANGUAGE CPP, TypeFamilies, RankNTypes, QuantifiedConstraints, UndecidableInstances, DeriveFoldable #-}
+{-# LANGUAGE CPP, TypeFamilies, RankNTypes, QuantifiedConstraints, DeriveFoldable #-}
 
 -- | This module defines a type for sorted lists, together
 --   with several functions to create and use values of that
@@ -88,10 +88,8 @@ import qualified GHC.Exts as Exts
 #if !MIN_VERSION_base(4,8,0)
 import Data.Monoid (Monoid (..))
 #endif
---
-#if MIN_VERSION_base(4,9,0)
-import Data.Semigroup (Semigroup (..))
-#endif
+
+import Data.Functor.Classes (Ord1)
 
 -- | Type of sorted lists. Any (non-bottom) value of this type
 --   is a sorted list. Use the 'Monoid' instance to append sorted
@@ -131,7 +129,7 @@ uncons (SortedList (x:xs)) = Just (x, SortedList xs)
 toSortedList :: Ord a => [a] -> SortedList a
 toSortedList = SortedList . List.sort
 
-toSortedListF :: (forall a. Ord (f a)) => [f a] -> SortedListF f a
+toSortedListF :: (forall b. Ord (f b)) => [f a] -> SortedListF f a
 toSortedListF = SortedListF . toSortedList
 
 -- | /O(1)/. Create a list from a 'SortedListF. The returned list
@@ -423,13 +421,13 @@ union xs ys = xs `mappend` foldl (flip delete) (nub ys) xs
 newtype SortedListF f a = SortedListF {fromSortedListF :: SortedList (f a)}
   deriving (Show, Eq, Ord, Foldable)
 
-instance (Functor f, forall a. Ord (f a)) => Functor (SortedListF f) where
+instance (Functor f, Ord1 f) => Functor (SortedListF f) where
   fmap f =
     SortedListF . SortedList .
     fmap (fmap f) .
     fromSortedList . fromSortedListF
 
-instance (Traversable f, forall a. Ord (f a)) => Traversable (SortedListF f) where
+instance (Traversable f, Ord1 f) => Traversable (SortedListF f) where
   traverse f =
     fmap (SortedListF . SortedList) .
     traverse (traverse f) .
