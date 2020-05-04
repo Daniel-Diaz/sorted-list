@@ -1,5 +1,5 @@
 
-{-# LANGUAGE CPP, TypeFamilies, RankNTypes, QuantifiedConstraints, DeriveFoldable #-}
+{-# LANGUAGE CPP, TypeFamilies, RankNTypes, QuantifiedConstraints, DeriveFoldable, GeneralizedNewtypeDeriving #-}
 
 -- | This module defines a type for sorted lists, together
 --   with several functions to create and use values of that
@@ -89,7 +89,8 @@ import qualified GHC.Exts as Exts
 import Data.Monoid (Monoid (..))
 #endif
 
-import Data.Functor.Classes (Ord1)
+import Data.Coerce (coerce)
+import Data.Functor.Classes (Eq1(liftEq), Ord1(liftCompare))
 
 -- | Type of sorted lists. Any (non-bottom) value of this type
 --   is a sorted list. Use the 'Monoid' instance to append sorted
@@ -129,8 +130,18 @@ uncons (SortedList (x:xs)) = Just (x, SortedList xs)
 toSortedList :: Ord a => [a] -> SortedList a
 toSortedList = SortedList . List.sort
 
-toSortedListF :: (forall b. Ord (f b)) => [f a] -> SortedListF f a
-toSortedListF = SortedListF . toSortedList
+newtype Orderable f a = Orderable {runOrderable :: f a}
+instance Eq1 f => Eq (Orderable f a) where
+  x == y = liftEq undefined (runOrderable x) (runOrderable y)
+instance Ord1 f => Ord (Orderable f a) where
+  compare x y = liftCompare undefined (runOrderable x) (runOrderable y)
+
+toSortedListF :: forall f a. Ord1 f => [f a] -> SortedListF f a
+toSortedListF =
+  SortedListF .
+  (coerce :: SortedList (Orderable f a) -> SortedList (f a)) .
+  toSortedList .
+  (coerce :: [f a] -> [Orderable f a])
 
 -- | /O(1)/. Create a list from a 'SortedListF. The returned list
 --   is guaranteed to be sorted.
@@ -419,7 +430,7 @@ union xs ys = xs `mappend` foldl (flip delete) (nub ys) xs
 
 -- | Functor and Traversable on a value that is independent of Ord
 newtype SortedListF f a = SortedListF {fromSortedListF :: SortedList (f a)}
-  deriving (Show, Eq, Ord, Foldable)
+  deriving (Show, Eq, Ord, Foldable, Semigroup, Monoid)
 
 instance (Functor f, Ord1 f) => Functor (SortedListF f) where
   fmap f =
