@@ -8,7 +8,7 @@
 module Data.SortedList (
     -- * Type
     SortedList
-  , SortedListF
+  , SortedListF(SortedListF)
     -- * List conversions
   , toSortedList
   , toSortedListF
