@@ -91,7 +91,7 @@ import Data.Semigroup (Semigroup (..))
 #endif
 
 -- | Type of sorted lists. Any (non-bottom) value of this type
---   is a sorted list. Use the 'Monoid' instance to append sorted
+--   is a sorted list. Use the 'Monoid' instance to merge sorted
 --   lists.
 newtype SortedList a = SortedList [a] deriving (Eq, Ord)
 
