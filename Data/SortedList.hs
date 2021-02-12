@@ -1,5 +1,5 @@
 
-{-# LANGUAGE CPP, TypeFamilies #-}
+{-# LANGUAGE CPP, TypeFamilies, RankNTypes, QuantifiedConstraints, DeriveFoldable, GeneralizedNewtypeDeriving #-}
 
 -- | This module defines a type for sorted lists, together
 --   with several functions to create and use values of that
@@ -8,9 +8,12 @@
 module Data.SortedList (
     -- * Type
     SortedList
+  , SortedListF(SortedListF)
     -- * List conversions
   , toSortedList
+  , toSortedListF
   , fromSortedList
+  , fromSortedListF
     -- * Construction
   , singleton
   , repeat
@@ -85,10 +88,9 @@ import qualified GHC.Exts as Exts
 #if !MIN_VERSION_base(4,8,0)
 import Data.Monoid (Monoid (..))
 #endif
---
-#if MIN_VERSION_base(4,9,0)
-import Data.Semigroup (Semigroup (..))
-#endif
+
+import Data.Coerce (coerce)
+import Data.Functor.Classes (Eq1(liftEq), Ord1(liftCompare))
 
 -- | Type of sorted lists. Any (non-bottom) value of this type
 --   is a sorted list. Use the 'Monoid' instance to merge sorted
@@ -124,11 +126,24 @@ uncons :: SortedList a -> Maybe (a, SortedList a)
 uncons (SortedList []) = Nothing
 uncons (SortedList (x:xs)) = Just (x, SortedList xs)
 
--- | Create a 'SortedList' by sorting a regular list.
+-- | Create a 'SortedListF by sorting a regular list.
 toSortedList :: Ord a => [a] -> SortedList a
 toSortedList = SortedList . List.sort
 
--- | /O(1)/. Create a list from a 'SortedList'. The returned list
+newtype Orderable f a = Orderable {runOrderable :: f a}
+instance Eq1 f => Eq (Orderable f a) where
+  x == y = liftEq undefined (runOrderable x) (runOrderable y)
+instance Ord1 f => Ord (Orderable f a) where
+  compare x y = liftCompare undefined (runOrderable x) (runOrderable y)
+
+toSortedListF :: forall f a. Ord1 f => [f a] -> SortedListF f a
+toSortedListF =
+  SortedListF .
+  (coerce :: SortedList (Orderable f a) -> SortedList (f a)) .
+  toSortedList .
+  (coerce :: [f a] -> [Orderable f a])
+
+-- | /O(1)/. Create a list from a 'SortedListF. The returned list
 --   is guaranteed to be sorted.
 fromSortedList :: SortedList a -> [a]
 fromSortedList (SortedList xs) = xs
@@ -314,10 +329,10 @@ instance Foldable SortedList where
 -- | Map a function over all the elements of a sorted list.
 --   Note that 'map' will hang if the argument is an infinite list.
 --
---   Even though 'SortedList' can't be made an instance of 'Functor',
+--   Even though 'SortedListF can't be made an instance of 'Functor',
 --   'map' /does/ hold the 'Functor' laws (for finite lists).
 --   We can't however write an instance because of the 'Ord' instance requirement on the type of
---   the elements of the result list. Therefore, while 'SortedList'
+--   the elements of the result list. Therefore, while 'SortedListF
 --   is not a functor type in general, it is when restricted to elements of
 --   orderable types (for finite lists).
 --
@@ -411,3 +426,21 @@ intersect xs ys =
 --   but if the first list contains duplicates, so will the result.
 union :: Ord a => SortedList a -> SortedList a -> SortedList a
 union xs ys = xs `mappend` foldl (flip delete) (nub ys) xs
+
+
+-- | Functor and Traversable on a value that is independent of Ord
+newtype SortedListF f a = SortedListF {fromSortedListF :: SortedList (f a)}
+  deriving (Show, Eq, Ord, Foldable, Semigroup, Monoid)
+
+instance (Functor f, Ord1 f) => Functor (SortedListF f) where
+  fmap f =
+    SortedListF . SortedList .
+    fmap (fmap f) .
+    fromSortedList . fromSortedListF
+
+instance (Traversable f, Ord1 f) => Traversable (SortedListF f) where
+  traverse f =
+    fmap (SortedListF . SortedList) .
+    traverse (traverse f) .
+    fromSortedList . fromSortedListF
+
